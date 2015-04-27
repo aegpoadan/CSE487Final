@@ -1,0 +1,11 @@
+# Ignore everything
+*
+
+# But not these files...
+!.gitignore
+!*.unitypackage
+
+# etc...
+
+# ...even if they are in subdirectories
+!*/
