@@ -4,6 +4,7 @@
 # But not these files...
 !.gitignore
 !*.unitypackage
+!*.cs
 
 # etc...
 
