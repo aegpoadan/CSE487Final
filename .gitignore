@@ -5,6 +5,7 @@
 !.gitignore
 !*.unitypackage
 !*.cs
+!*.rtf
 
 # etc...
 
