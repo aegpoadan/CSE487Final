@@ -1,0 +1,40 @@
+Features To Do:
+	•	Gadgets (4 total?)
+	⁃	Then Level design
+	⁃	Carry forward from level to level
+
+	•	GUI
+	⁃	Display current gadgets
+	⁃	Gadget sprites for GUI
+	•	Main Menu Level
+	•	Sounds Assets
+	⁃	Background music (Andrew?)
+	⁃	Gadget use
+	•	Z switch feature?
+	•	Enemies?
+	•	Mouse aiming
+	•	Terrain (decorational)
+
+
+
+Gadgets:
+	•	Jetpack
+	•	Shotgun (Gaurub)
+	•	Slow time (Andrew)
+	•	Destroy Environment (Gavin)
+
+REMINDER:
+	•	Keep packages small and for a single purpose!!
+
+Priority:
+1.	Gadgets/Level design
+2.  Mouse Aiming (Gavin)
+3.	Z-switch (Andrew)
+4.  Enemies (simple animations with player collision detection)
+5.	Game Manager (stats, game state...)
+6.	Skybox (nighttime)
+
+
+Till the End:
+1.  Level Detail
+2.  Sound
