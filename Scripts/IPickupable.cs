@@ -16,6 +16,8 @@ public interface IPickupable
 
 	void SetOwner(GameObject owner);
 
+	void SetActive(bool active);
+
 	/// <summary>
 	/// Aligns the position of the weapon on pickup.
 	/// </summary>

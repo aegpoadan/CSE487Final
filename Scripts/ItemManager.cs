@@ -45,22 +45,23 @@ public class ItemManager : MonoBehaviour, IPickup {
 	bool IPickup.HasItem (GameObject item)
 	{
 		GameObject found = itemsHeld.SingleOrDefault( i => i == item);
-		bool hasItem = (found != null); //new GameObject());
-		if (hasItem) {
-			//print ("Already have item");
-		} else {
-			//print ("Found new item");
-		}
+		bool hasItem = (found != null);
 		return hasItem;
 	}
 
 	void SetActiveItem(GameObject item) {
 		itemsHeld.ForEach(i => {
 			IPickupable ip = i.GetComponent<PhysicsWeapon>() as IPickupable;
-			if (i == item) {
-				ip.SetActive(true);
+			//TODO -- Change above call to find a generic "Item" class, rather than "PhysicsWeapon"
+			if (ip == null) {
+				throw new UnityException("Bad data...this should only be dealing with items that implement IPickupable");
+
 			} else {
-				ip.SetActive(false);
+				if (i == item) {
+					ip.SetActive(true);
+				} else {
+					ip.SetActive(false);
+				}
 			}
 		});
 	}

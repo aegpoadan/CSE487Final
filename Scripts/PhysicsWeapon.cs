@@ -64,6 +64,7 @@ public class PhysicsWeapon : MonoBehaviour, IPickupable {
 	/// React to button input only if weapon is active (used by player).
 	/// </summary>
 	private bool isActiveWeapon = false;
+	private Renderer itemRenderer;
 
 
 	public void Awake()
@@ -83,6 +84,16 @@ public class PhysicsWeapon : MonoBehaviour, IPickupable {
 			idleParticles.Play();
 		}
 		StartCoroutine(TimedShotCoroutine());
+
+		if (!itemRenderer) {
+			itemRenderer = GetComponent<Renderer>();
+		}
+		if (!itemRenderer) {
+			itemRenderer = GetComponentInChildren<Renderer>();
+		}
+		if (!itemRenderer) {
+			throw new MissingReferenceException("Must specify the primary " + this.gameObject.name + " renderer.");
+		}
 	}
 	
 	// Update is called once per frame
@@ -146,7 +157,9 @@ public class PhysicsWeapon : MonoBehaviour, IPickupable {
 	/// <param name="removePhysics">If set to <c>true</c> remove physics.</param>
 	private void ChangePhysics(bool removePhysics) {
 		this.GetComponent<Rigidbody>().isKinematic = removePhysics;
-		this.GetComponent<Collider>().isTrigger = removePhysics;
+
+		this.GetComponentInChildren<Collider>().isTrigger = removePhysics;
+		//this.GetComponent<Collider>().isTrigger = removePhysics;
 	}
 	#endregion
 	
@@ -171,6 +184,12 @@ public class PhysicsWeapon : MonoBehaviour, IPickupable {
 		ownerRbody = null;
 	}
 
+	public void SetActive(bool active)
+	{
+		isActiveWeapon = active;
+		itemRenderer.enabled = active;
+
+	}
 
 
 	public void AlignPositionOnPickup ()
@@ -184,7 +203,6 @@ public class PhysicsWeapon : MonoBehaviour, IPickupable {
 	{
 		IPickup pu = (IPickup)(other.gameObject.GetComponent(typeof(IPickup)));
 		if (pu != null) {
-
 			if (pu.HasItem(this.gameObject)) {
 //				print ("Getting dropped.");
 //				this.GetDropped(); // Does order matter?!

@@ -27,6 +27,9 @@ public class MouseAim : MonoBehaviour {
 	public float maxAimDistance;
 	public LayerMask hittableAimLayers;
 
+	public bool DEBUG = true;
+
+
 	// Used to hold the location for the GUI texture
 	private Vector2 aimLoc;
 
@@ -35,36 +38,42 @@ public class MouseAim : MonoBehaviour {
 	public void LateUpdate(){
 
 		// Expressed in ***PIXELS*** from the origin of the transform object to the pointer position on screen.
-		Vector3 point = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, Camera.main.farClipPlane));
+		//Vector3 point = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, Camera.main.farClipPlane));
 
-		// Clamp the mouse pointer world point to the holding object's Z-position for 2D pointing.
-		point.z = mainParent.position.z;
+		// Calculate the mouse pointer position assuming its Z position is that of the player.
+		float distFromCam = Mathf.Abs (Camera.main.transform.position.z - aimingBodyPart.position.z);
+		Vector3 cursorPoint = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, distFromCam));
+		Vector3 finalPoint = cursorPoint;
 
-		Debug.DrawLine(mainParent.position, point, Color.black);
-		//Debug.DrawLine(mainParent.position, mainParent.position + point.normalized * maxAimDistance, Color.black);
 
-		// Get cursor point relative to the parent object (e.g. character)
-		Vector3 localRelativePoint = mainParent.InverseTransformPoint(point);
+		// Get cursor point relative to the mainParent
+		Vector3 localRelativePoint = mainParent.InverseTransformPoint(cursorPoint);
 		if(localRelativePoint.z < 0){
-			print ("Behind");
 			// Point is behind the character. We don't want character turning 
 			// around so "reflect" the point back to the coinciding point in front of the character
 
-			// This is the original Mechanim inverse calculation.  I believe it is incorrect but the results are very similar...
-			//Vector3 mechInverseZ = transform.InverseTransformPoint(localRelativePoint.x,localRelativePoint.y,-localRelativePoint.z);
-			Vector3 inverseZ = localRelativePoint;
-			inverseZ.z = -localRelativePoint.z;
+			Vector3 reflectedPt = localRelativePoint;
+			// Reflect to opposite end of the mainParent's local forward (Z) axis.
+			reflectedPt.z = -localRelativePoint.z;
 
-			//print ("My calc: " + inverseZ + "  ||  Mech: " + mechInverseZ);
-
-			//point = mechInverseZ;
-			point = inverseZ;
+			/* Point is current expressed relative the mainParent's origin.
+			 * Express it relative to the world coordinate system. 
+			 **/
+			finalPoint = mainParent.TransformPoint(reflectedPt);
 		}
 
-		aimingBodyPart.LookAt(point, Vector3.up);
+		// Clamp the mouse pointer world point to the holding object's Z-position for 2D pointing.
+
+		if (DEBUG) {
+			Debug.DrawLine(aimingBodyPart.position, finalPoint, Color.black);
+			Debug.DrawLine(aimingBodyPart.position, cursorPoint, Color.yellow);
+		}
+
+		// Look at point, no matter where it is.
+		aimingBodyPart.LookAt(finalPoint, Vector3.up);
 
 
-
+		// Constrain the look rotation within the desired boundaries
 		Vector3 tempLocalRot = aimingBodyPart.localEulerAngles;
 		// CLAMP (UP/DOWN) LOOK ROTATION WITHIN USER SPECIFIED BOUNDS
 		tempLocalRot = clampEulerRotation(tempLocalRot);
@@ -75,17 +84,38 @@ public class MouseAim : MonoBehaviour {
 
 		// Draw ray forward from the current rotation and place the GUI cursor
 		// on any target that it hits.
+//		RaycastHit hit;
+//		Vector3 rayTarget = aimingBodyPart.forward;
+//		if (Physics.Raycast (aimingBodyPart.position, aimingBodyPart.forward, out hit, maxAimDistance, hittableAimLayers)) {
+//			rayTarget *= hit.distance;
+//			aimLoc =  Camera.main.WorldToViewportPoint(hit.point);
+//		} else {
+//			print ("No hit");
+//			rayTarget *= maxAimDistance;
+//			aimLoc = Camera.main.WorldToViewportPoint(rayTarget);
+//		}
+//		//print ("Ray start: " + aimingBodyPart.position + ", End: " + rayTarget);
+//		Debug.DrawRay (aimingBodyPart.position, rayTarget, Color.red);
+
+
+		// Draw ray forward from the current rotation and place the GUI cursor
+		// on any target that it hits.
 		RaycastHit hit;
-		Vector3 rayTarget = aimingBodyPart.forward;
-		if (Physics.Raycast (aimingBodyPart.position, aimingBodyPart.forward, out hit, maxAimDistance, hittableAimLayers)) {
-			rayTarget *= hit.distance;
+		Vector3 rayTarget = Vector3.zero;
+
+		float aimDist = Vector3.Distance(aimingBodyPart.position, finalPoint);
+		if (Physics.Raycast (aimingBodyPart.position, aimingBodyPart.forward, out hit, aimDist, hittableAimLayers)) {
+			rayTarget = aimingBodyPart.forward * hit.distance;
 			aimLoc =  Camera.main.WorldToViewportPoint(hit.point);
 		} else {
-			rayTarget *= maxAimDistance;
+			rayTarget = finalPoint;
 			aimLoc = Camera.main.WorldToViewportPoint(rayTarget);
 		}
-		//print ("Ray start: " + aimingBodyPart.position + ", End: " + rayTarget);
-		Debug.DrawRay (aimingBodyPart.position, rayTarget, Color.red);
+		
+		if (DEBUG) {
+			Debug.DrawLine(aimingBodyPart.position, finalPoint, Color.black);
+			Debug.DrawLine(aimingBodyPart.position, cursorPoint, Color.yellow);
+		}
     }
 
 
