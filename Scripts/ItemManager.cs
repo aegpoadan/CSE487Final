@@ -1,0 +1,82 @@
+﻿using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+
+public class ItemManager : MonoBehaviour, IPickup {
+
+	public List<string> switchItemButtons;
+
+	private List<GameObject> itemsHeld;
+	public Transform weaponHolder;
+
+	public void Start()
+	{
+		itemsHeld = new List<GameObject>();
+	}
+
+	public void Update() {
+		CheckItemSwitch();
+	}
+
+
+	#region IPickup implementation
+
+	public void Pickup (GameObject item)
+	{
+		item.transform.SetParent(weaponHolder, false);
+		itemsHeld.Add(item);
+		IPickupable ip = (IPickupable)(item.GetComponents<MonoBehaviour>().First(mb => (mb as IPickupable != null)));
+		ip.SetOwner(this.gameObject);
+
+		SetActiveItem(item);
+	}
+
+	public void Drop (GameObject item)
+	{
+		print ("Dropping item");
+		item.transform.SetParent(null, true);
+		if (!itemsHeld.Remove(item)) {
+			throw new System.Exception("Invalid program logic.  All item removals should return true.");
+		}
+	}
+	
+
+	bool IPickup.HasItem (GameObject item)
+	{
+		GameObject found = itemsHeld.SingleOrDefault( i => i == item);
+		bool hasItem = (found != null); //new GameObject());
+		if (hasItem) {
+			//print ("Already have item");
+		} else {
+			//print ("Found new item");
+		}
+		return hasItem;
+	}
+
+	void SetActiveItem(GameObject item) {
+		itemsHeld.ForEach(i => {
+			IPickupable ip = i.GetComponent<PhysicsWeapon>() as IPickupable;
+			if (i == item) {
+				ip.SetActive(true);
+			} else {
+				ip.SetActive(false);
+			}
+		});
+	}
+
+	void CheckItemSwitch()
+	{
+		for (int i = 0; (i < switchItemButtons.Count); i++) {
+			if (Input.GetButtonDown(switchItemButtons[i])) {
+				if (i < itemsHeld.Count) {
+					SetActiveItem(itemsHeld[i]);
+				}
+			}
+		}
+	}
+
+
+	#endregion
+
+}
