@@ -54,6 +54,14 @@ public class Item : MonoBehaviour, IPickupable {
 	[Range(1, 100)]
 	public float bulletsPerShot = 1f;
 	/// <summary>
+	/// If false, item will never need to reload.
+	/// </summary>
+	public bool hasClipSize = true;
+	[Range(1, 1000)]
+	public int ammoClipSize = 20;
+	[Range(0, 10)]
+	public float reloadDuration = 2f;
+	/// <summary>
 	/// Angle of spread cone. Zero is straight.
 	/// </summary>
 	[Range(0, 90)]
@@ -77,6 +85,8 @@ public class Item : MonoBehaviour, IPickupable {
 
 	public AudioClip shotSound;
 
+	public AudioClip reloadSound;
+
 	public List<Renderer> itemRenderers;
 
 	public List<Collider> itemColliders;
@@ -88,6 +98,8 @@ public class Item : MonoBehaviour, IPickupable {
 	private bool isActiveWeapon = false;
 	
 	private AudioSource itemAudioSource;
+
+	private int currentBulletsShot = 0;
 
 
 	public void Awake()
@@ -180,6 +192,13 @@ public class Item : MonoBehaviour, IPickupable {
 						itemAudioSource.Play();
 						itemAudioSource.time = 0f;
 					}
+
+					if (hasClipSize && currentBulletsShot > ammoClipSize) {
+						currentBulletsShot = 0;
+						yield return StartCoroutine(ReloadItem());
+						continue;
+					}
+					currentBulletsShot++;
 					ShootWeapon ();
 					yield return new WaitForSeconds(shotWaitTime);
 				}
@@ -209,6 +228,13 @@ public class Item : MonoBehaviour, IPickupable {
 			Destroy (shotEffect.gameObject, shotEffect.duration);
 		}
 
+	}
+
+
+	private IEnumerator ReloadItem() {
+		AudioSource.PlayClipAtPoint(reloadSound, this.transform.position);
+		yield return new WaitForSeconds(reloadDuration);
+		yield break;
 	}
 
 	/// <summary>

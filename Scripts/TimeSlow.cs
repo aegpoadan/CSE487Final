@@ -6,13 +6,13 @@ public class TimeSlow : MonoBehaviour {
 	private GlobalData globalData;
 
 	void Awake() {
-		gameManager = GameObject.Find ("GameManager");
+		gameManager = GameObject.Find ("__GM__");
 		globalData = gameManager.GetComponent<GlobalData> ();
 	}
 
 	// Use this for initialization
 	void Start () {
-		StartCoroutine ("slowEnemies");
+		StartCoroutine (SlowEnemies());
 		Destroy (gameObject, 5.1f);	
 	}
 	
@@ -21,7 +21,7 @@ public class TimeSlow : MonoBehaviour {
 	
 	}
 
-	IEnumerator slowEnemies() {
+	IEnumerator SlowEnemies() {
 		print ("Slowing enemies!");
 		globalData.enemySpeed = .5f;	//Reduce enemy speed to half of original value
 		yield return new WaitForSeconds(5.0f); //Enemies are slowed for 5 seconds

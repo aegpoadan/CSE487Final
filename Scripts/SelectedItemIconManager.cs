@@ -38,7 +38,6 @@ public class SelectedItemIconManager : MonoBehaviour {
 		highlightIcon.gameObject.SetActive(false);
 		defaultAnchorMinMax = bgRects[0].anchorMin;
 		default3DAnchorPos = bgRects[0].anchoredPosition3D;
-		print ("Normal pos: " + defaultAnchorMinMax);
 
 		if (itemButtonNames.Count != bgGUIObjects.Count) {
 			throw new UnityException("Must specify equal number of button names and GUI rects.");
@@ -46,14 +45,12 @@ public class SelectedItemIconManager : MonoBehaviour {
 		if (MAX_ITEMS > 1) {
 			highlightIcon.anchoredPosition = bgRects[0].anchoredPosition;
 			offset = bgRects[1].anchorMin - bgRects[0].anchorMin;
-			print ("Offset: " + offset);
 		}
 	}
 
 	public void UpdateGUIItems(List<Sprite> passedImages) {
 		if (itemImages.Count > MAX_ITEMS) {
 			throw new UnityException("Insufficient number of icons for desired item count.");
-			return;
 		}
 
 		currentNumItems = passedImages.Count;
