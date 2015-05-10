@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -79,13 +80,15 @@ public class Item : MonoBehaviour, IPickupable {
 	public List<Renderer> itemRenderers;
 
 	public List<Collider> itemColliders;
+	public bool loopAudio = true;
+	public Sprite itemImage;
 	/// <summary>
 	/// React to button input only if weapon is active (used by player).
 	/// </summary>
 	private bool isActiveWeapon = false;
 	
 	private AudioSource itemAudioSource;
-	public bool loopAudio = true;
+
 
 	public void Awake()
 	{
@@ -238,7 +241,8 @@ public class Item : MonoBehaviour, IPickupable {
 
 	public void GetPickedPickup ()
 	{
-		isActiveWeapon = true;
+		//isActiveWeapon = true;
+		EnableItem(false);
 		ChangePhysics(true);
 
 		AlignPositionOnPickup();
@@ -248,7 +252,7 @@ public class Item : MonoBehaviour, IPickupable {
 
 	public void GetDropped ()
 	{
-		isActiveWeapon = false;
+		//isActiveWeapon = false;
 		ChangePhysics(false);
 		ownerRbody = null;
 	}

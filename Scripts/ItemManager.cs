@@ -1,9 +1,13 @@
 using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
 public class ItemManager : MonoBehaviour, IPickup {
+
+	// Call updates to GUI when number of items changes.
+	public SelectedItemIconManager guiManager;
 
 	public List<string> itemButtonNames;
 
@@ -29,7 +33,9 @@ public class ItemManager : MonoBehaviour, IPickup {
 		IPickupable ip = (IPickupable)(item.GetComponents<MonoBehaviour>().First(mb => (mb as IPickupable != null)));
 		ip.SetOwner(this.gameObject);
 
-		SetActiveItem(item);
+		//SetActiveItem(item);
+
+		guiManager.UpdateGUIItems(GetItemImages());
 	}
 
 	public void Drop (GameObject item)
@@ -49,7 +55,7 @@ public class ItemManager : MonoBehaviour, IPickup {
 		return hasItem;
 	}
 
-	void SetActiveItem(GameObject item) {
+	public void SetActiveItem(GameObject item) {
 		itemsHeld.ForEach(i => {
 			IPickupable ip = i.GetComponent<Item>() as IPickupable;
 			//TODO -- Change above call to find a generic "Item" class, rather than "PhysicsWeapon"
@@ -75,6 +81,16 @@ public class ItemManager : MonoBehaviour, IPickup {
 				}
 			}
 		}
+	}
+
+	public List<Sprite> GetItemImages() {
+		List<Sprite> images = new List<Sprite>();
+		itemsHeld.ForEach(item => (images.Add (item.GetComponent<Item>().itemImage)));
+		return images;
+	}
+
+	public int GetNumItemsHeld() {
+		return itemsHeld.Count;
 	}
 
 
