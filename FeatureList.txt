@@ -38,3 +38,23 @@ Priority:
 Till the End:
 1.  Level Detail
 2.  Sound
+
+
+FINAL TODO:
+-- Animate Enemies between objects
+-- Add 2D image property to weapons for GUI display
+-- Timer in GUI
+
+-- Gavin -- Animate enemies
+	 -- Add sound
+	 -- Adding weapon GUI images
+
+-- Gaurab -- Spash screen and pause menu
+	  -- GUI timer
+	  -- Level transitions
+	  -- Loading bar between scenes??
+
+-- Andrew -- Slow weapon
+	  -- Level Decoration
+
+

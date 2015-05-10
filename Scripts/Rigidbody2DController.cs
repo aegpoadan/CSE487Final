@@ -38,13 +38,21 @@ public class Rigidbody2DController : MonoBehaviour {
 	/// </summary>
 	[Range(-5, 5f)]
 	public float characterHeight;
-
+	/// <summary>
+	/// If enabled, character will be incapable of of side movement
+	/// while not grounded.
+	/// </summary>
 	public bool allowAirMovement = false;
-
-	public Animator animator; //Animator for the player.
+	/// <summary>
+	/// Controls character idle, walking, animations if available.
+	/// </summary>
+	private Animator animator;
+	/// <summary>
+	/// If enabled, various rays will be drawn.
+	/// </summary>
+	public bool DEBUG = true;
 
 	private Rigidbody rbody;
-
 	private LookDirection currentDirection;
 	
 	/// <summary>
@@ -65,9 +73,10 @@ public class Rigidbody2DController : MonoBehaviour {
 		TestLookRight(); // Force adjustment with oppposites.
 		sqrMaxVelocity = maxMoveSpeed * maxMoveSpeed;
 
-		if (!animator) {
+		if (!animator && !(animator = GetComponent<Animator>())) {
 			//Getting the Animator for the player ready
-			animator = GetComponent<Animator> ();
+			//animator = GetComponent<Animator> ();
+			print ("No character animator found.  Not using animations.");
 		}
 	}
 
@@ -166,7 +175,9 @@ public class Rigidbody2DController : MonoBehaviour {
 		Vector3 pos = this.transform.position;
 		pos.y += characterHeight;
 		Ray downRay = new Ray(pos, Vector3.down);
-		Debug.DrawRay(downRay.origin, downRay.direction, Color.green, 2f);
+		if (DEBUG) {
+			Debug.DrawRay(downRay.origin, downRay.direction, Color.green, 2f);
+		}
 		return (true == Physics.Raycast(downRay, distFromCenterToGround));
 	}
 

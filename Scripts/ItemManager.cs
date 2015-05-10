@@ -1,11 +1,11 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
 public class ItemManager : MonoBehaviour, IPickup {
 
-	public List<string> switchItemButtons;
+	public List<string> itemButtonNames;
 
 	private List<GameObject> itemsHeld;
 	public Transform weaponHolder;
@@ -51,16 +51,16 @@ public class ItemManager : MonoBehaviour, IPickup {
 
 	void SetActiveItem(GameObject item) {
 		itemsHeld.ForEach(i => {
-			IPickupable ip = i.GetComponent<PhysicsWeapon>() as IPickupable;
+			IPickupable ip = i.GetComponent<Item>() as IPickupable;
 			//TODO -- Change above call to find a generic "Item" class, rather than "PhysicsWeapon"
 			if (ip == null) {
 				throw new UnityException("Bad data...this should only be dealing with items that implement IPickupable");
 
 			} else {
 				if (i == item) {
-					ip.SetActive(true);
+					ip.EnableItem(true);
 				} else {
-					ip.SetActive(false);
+					ip.EnableItem(false);
 				}
 			}
 		});
@@ -68,8 +68,8 @@ public class ItemManager : MonoBehaviour, IPickup {
 
 	void CheckItemSwitch()
 	{
-		for (int i = 0; (i < switchItemButtons.Count); i++) {
-			if (Input.GetButtonDown(switchItemButtons[i])) {
+		for (int i = 0; (i < itemButtonNames.Count); i++) {
+			if (Input.GetButtonDown(itemButtonNames[i])) {
 				if (i < itemsHeld.Count) {
 					SetActiveItem(itemsHeld[i]);
 				}

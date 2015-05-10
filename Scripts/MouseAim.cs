@@ -3,6 +3,10 @@ using System.Collections;
 
 public class MouseAim : MonoBehaviour {
 
+	/// <summary>
+	/// Character tracking plane for use in detecting player aligned mouse pointer position.
+	/// </summary>
+	public Plane trackingPlane2D;
 	public bool lockX;
 	[Range(0, 360)]
 	public float xLockRot;
@@ -25,6 +29,10 @@ public class MouseAim : MonoBehaviour {
 
 	[Range(1, 100)]
 	public float maxAimDistance;
+	/// <summary>
+	/// Layers that the aiming raycast should consider valid for collisions.
+	/// Uncheck all layers that the aim raycast should ignore.
+	/// </summary>
 	public LayerMask hittableAimLayers;
 
 	public bool DEBUG = true;
@@ -33,16 +41,37 @@ public class MouseAim : MonoBehaviour {
 	// Used to hold the location for the GUI texture
 	private Vector2 aimLoc;
 
+	public void Start() {
+		//Cursor.visible = false;
+		if (aimingBodyPart) {
+			//trackingPlane2D = new ;
+		} else {
+			throw new UnityException("Missing aimer object reference. Need it to create mouse pointer tracking plane.");
+		}
+	}
 
-
-	public void LateUpdate(){
-
-		// Expressed in ***PIXELS*** from the origin of the transform object to the pointer position on screen.
+	public void LateUpdate()
+	{
+		//trackingPlane2D = new Plane(Vector3.forward, aimingBodyPart.position);
+		/* Raycast from cam straight forward to the far bounds of the clipping frustum.
+		 * Expressed in ***PIXELS*** (screen coordinates) from the center of the screen
+		 * to the pointer position on screen.
+		 * */
 		//Vector3 point = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, Camera.main.farClipPlane));
 
 		// Calculate the mouse pointer position assuming its Z position is that of the player.
-		float distFromCam = Mathf.Abs (Camera.main.transform.position.z - aimingBodyPart.position.z);
-		Vector3 cursorPoint = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, distFromCam));
+		//float distFromCam = Mathf.Abs (Camera.main.transform.position.z - aimingBodyPart.position.z);
+		Vector3 cursorPoint = aimingBodyPart.position;// = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, distFromCam));
+
+		Ray camForwardRay = Camera.main.ScreenPointToRay(Input.mousePosition);
+		float distToPlane = 0f;
+		if (new Plane(Vector3.forward, aimingBodyPart.position).Raycast(camForwardRay, out distToPlane)) {
+			cursorPoint = camForwardRay.origin + camForwardRay.direction * distToPlane;
+		} else {
+			print ("Ray dist: " + distToPlane);
+			throw new UnityException("Bad logic. Cam should always be raycasting towards the tracking plane.");
+		}
+
 		Vector3 finalPoint = cursorPoint;
 
 
@@ -63,7 +92,6 @@ public class MouseAim : MonoBehaviour {
 		}
 
 		// Clamp the mouse pointer world point to the holding object's Z-position for 2D pointing.
-
 		if (DEBUG) {
 			Debug.DrawLine(aimingBodyPart.position, finalPoint, Color.black);
 			Debug.DrawLine(aimingBodyPart.position, cursorPoint, Color.yellow);
@@ -81,21 +109,6 @@ public class MouseAim : MonoBehaviour {
 		tempLocalRot = lockedEulerRotation(tempLocalRot);
 		// Set the clamped and locked local rotation
 		aimingBodyPart.localEulerAngles = tempLocalRot;
-
-		// Draw ray forward from the current rotation and place the GUI cursor
-		// on any target that it hits.
-//		RaycastHit hit;
-//		Vector3 rayTarget = aimingBodyPart.forward;
-//		if (Physics.Raycast (aimingBodyPart.position, aimingBodyPart.forward, out hit, maxAimDistance, hittableAimLayers)) {
-//			rayTarget *= hit.distance;
-//			aimLoc =  Camera.main.WorldToViewportPoint(hit.point);
-//		} else {
-//			print ("No hit");
-//			rayTarget *= maxAimDistance;
-//			aimLoc = Camera.main.WorldToViewportPoint(rayTarget);
-//		}
-//		//print ("Ray start: " + aimingBodyPart.position + ", End: " + rayTarget);
-//		Debug.DrawRay (aimingBodyPart.position, rayTarget, Color.red);
 
 
 		// Draw ray forward from the current rotation and place the GUI cursor

@@ -21,8 +21,8 @@ namespace MyUtilities {
 		/// <param name="parent">Parent game object.</param>
 		/// <param name="handler">Handler method.</param>
 		/// <param name="recurseType">Recurse type.</param>
-		public static void IterateChildren(GameObject parent, Handler handler, RecurseType recurseType) {
-			Iterate(parent, handler, recurseType);
+		public static void IterateChildren(GameObject parent, RecurseType recurseType, Handler handler) {
+			Iterate(parent, recurseType, handler);
 		}
 
 		/// <summary>
@@ -31,12 +31,12 @@ namespace MyUtilities {
 		/// <param name="parent">Parent.</param>
 		/// <param name="handler">Handler.</param>
 		/// <param name="recurseType">Recurse type.</param>
-		private static void Iterate (GameObject parent, Handler handler, RecurseType recurseType)
+		private static void Iterate (GameObject parent, RecurseType recurseType, Handler handler)
 		{
 			foreach(Transform child in parent.transform) {
 				handler(child.gameObject);
 				if (recurseType == RecurseType.RECURSE) {
-					Iterate(child.gameObject, handler, recurseType);
+					Iterate(child.gameObject, recurseType, handler);
 				}
 			}
 		}
